@@ -11,6 +11,7 @@ import com.codepath.hughhn.gridimagesearch.models.ImageResult;
 import com.squareup.picasso.Picasso;
 
 public class ImageDisplayActivity extends Activity {
+	private int screenWidth;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +26,7 @@ public class ImageDisplayActivity extends Activity {
 		// Find the image view
 		ImageView ivImageResult = (ImageView) findViewById(R.id.ivImageResult);
 		// Load the image url into imageview using Picasso
-		Picasso.with(this).load(result.fullUrl).into(ivImageResult);
+		Picasso.with(this).load(result.fullUrl).fit().centerInside().into(ivImageResult);
 	}
 
 	@Override

@@ -8,5 +8,15 @@
     <string name="search_label">Search</string>
     <string name="title_label">Image Title</string>
     <string name="title_activity_image_display">Full Image</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="setting_size_label">Size</string>
+    <string name="setting_color_label">Color</string>
+    <string name="setting_type_label">Type</string>
+    <string name="setting_site_label">Site</string>
+    <string name="setting_size_hint">Enter size: [icon, small, medium, large, xlarge, xxlarge, huge]</string>
+    <string name="setting_color_hint">Enter Color: [black, blue, brown, gray, green, orange, pink, purple, red, teal, white, yellow]</string>
+    <string name="setting_type_hint">Enter Type: [face, photo, clipart, lineart]</string>
+    <string name="setting_site_hint">Enter Site: (e.g.: photobucket.com)</string>
+    <string name="settings_save_btn_label">Save</string>
 
 </resources>

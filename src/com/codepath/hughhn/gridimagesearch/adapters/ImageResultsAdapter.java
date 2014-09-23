@@ -16,6 +16,11 @@ import com.codepath.hughhn.gridimagesearch.models.ImageResult;
 import com.squareup.picasso.Picasso;
 
 public class ImageResultsAdapter extends ArrayAdapter<ImageResult> {
+	private static class ViewHolder {
+		ImageView ivImage;
+		TextView tvTitle;
+	}
+	
 	public ImageResultsAdapter(Context context, List<ImageResult> images) {
 		super(context, R.layout.item_image_result, images);
 	}
@@ -24,20 +29,24 @@ public class ImageResultsAdapter extends ArrayAdapter<ImageResult> {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ImageResult imageInfo = getItem(position);
 
+		ViewHolder viewHolder; // view lookup cache stored in tag
 		if (convertView == null) {
+			viewHolder = new ImageResultsAdapter.ViewHolder();
 			convertView = LayoutInflater.from(getContext()).inflate(
 					R.layout.item_image_result, parent, false);
+			viewHolder.ivImage = (ImageView) convertView.findViewById(R.id.ivImage);
+			viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
+			convertView.setTag(viewHolder);
+		} else {
+			viewHolder = (ViewHolder) convertView.getTag();
 		}
 
-		ImageView ivImage = (ImageView) convertView.findViewById(R.id.ivImage);
-		TextView tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
-
 		// Clear out image
-		ivImage.setImageResource(0);
+		viewHolder.ivImage.setImageResource(0);
 
-		tvTitle.setText(Html.fromHtml(imageInfo.title));
+		viewHolder.tvTitle.setText(Html.fromHtml(imageInfo.title));
 
-		Picasso.with(getContext()).load(imageInfo.thumbUrl).into(ivImage);
+		Picasso.with(getContext()).load(imageInfo.thumbUrl).into(viewHolder.ivImage);
 		
 		return convertView;
 	}

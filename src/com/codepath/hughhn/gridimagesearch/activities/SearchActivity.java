@@ -154,16 +154,16 @@ public class SearchActivity extends FragmentActivity implements
 						+ query + "&rsz=8" + "&start=" + String.valueOf(page));
 
 		mSettings = getSharedPreferences("Settings", 0);
-		String cookieName = mSettings.getString("imgsz", "");
-		if (!cookieName.equals("")) {
+		String cookieName = mSettings.getString("imgsz", "none");
+		if (!cookieName.equals("none")) {
 			searchUrl.append("&imgsz=" + cookieName);
 		}
-		cookieName = mSettings.getString("imgcolor", "");
-		if (!cookieName.equals("")) {
+		cookieName = mSettings.getString("imgcolor", "none");
+		if (!cookieName.equals("none")) {
 			searchUrl.append("&imgcolor=" + cookieName);
 		}
-		cookieName = mSettings.getString("imgtype", "");
-		if (!cookieName.equals("")) {
+		cookieName = mSettings.getString("imgtype", "none");
+		if (!cookieName.equals("none")) {
 			searchUrl.append("&imgtype=" + cookieName);
 		}
 		cookieName = mSettings.getString("as_sitesearch", "");

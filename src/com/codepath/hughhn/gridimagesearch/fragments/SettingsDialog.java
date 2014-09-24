@@ -6,22 +6,23 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
 import com.codepath.hughhn.gridimagesearch.R;
 import com.codepath.hughhn.gridimagesearch.models.SearchFilters;
 
 public class SettingsDialog extends DialogFragment {
-	private EditText etSize;
-	private EditText etColor;
-	private EditText etType;
+	private Spinner spSize;
+	private Spinner spColor;
+	private Spinner spType;
 	private EditText etSite;
 	private Button saveBtn;
 	private SharedPreferences mSettings;
-	private SharedPreferences.Editor editor;
 	private SettingDialogListener listener;
 
 	public SettingsDialog() {
@@ -42,22 +43,22 @@ public class SettingsDialog extends DialogFragment {
 
 		mSettings = getActivity().getSharedPreferences("Settings", 0);
 
-		etSize = (EditText) view.findViewById(R.id.etSize);
-		etColor = (EditText) view.findViewById(R.id.etColor);
-		etType = (EditText) view.findViewById(R.id.etType);
+		spSize = (Spinner) view.findViewById(R.id.spSize);
+		spColor = (Spinner) view.findViewById(R.id.spColor);
+		spType = (Spinner) view.findViewById(R.id.spType);
 		etSite = (EditText) view.findViewById(R.id.etSite);
 
 		String cookieName = mSettings.getString("imgsz", "");
 		if (!cookieName.equals("")) {
-			etSize.setText(cookieName);
+			setSpinnerToValue(spSize, cookieName);
 		}
 		cookieName = mSettings.getString("imgcolor", "");
 		if (!cookieName.equals("")) {
-			etColor.setText(cookieName);
+			setSpinnerToValue(spColor, cookieName);
 		}
 		cookieName = mSettings.getString("imgtype", "");
 		if (!cookieName.equals("")) {
-			etType.setText(cookieName);
+			setSpinnerToValue(spType, cookieName);
 		}
 		cookieName = mSettings.getString("as_sitesearch", "");
 		if (!cookieName.equals("")) {
@@ -72,14 +73,14 @@ public class SettingsDialog extends DialogFragment {
 				filters.imgColor = "";
 				filters.imgType = "";
 				filters.imgSite = "";
-				if (etSize.getText() != null) {
-					filters.imgSize = etSize.getText().toString();
+				if (spSize.getSelectedItem() != null) {
+					filters.imgSize = spSize.getSelectedItem().toString();
 				}
-				if (etColor.getText() != null) {
-					filters.imgColor = etColor.getText().toString();
+				if (spColor.getSelectedItem() != null) {
+					filters.imgColor = spColor.getSelectedItem().toString();
 				}
-				if (etType.getText() != null) {
-					filters.imgType = etType.getText().toString();
+				if (spType.getSelectedItem() != null) {
+					filters.imgType = spType.getSelectedItem().toString();
 				}
 				if (etSite.getText() != null) {
 					filters.imgSite = etSite.getText().toString();
@@ -89,6 +90,18 @@ public class SettingsDialog extends DialogFragment {
 		});
 
 		return view;
+	}
+	
+	public void setSpinnerToValue(Spinner spinner, String value) {
+		int index = 0;
+		SpinnerAdapter adapter = spinner.getAdapter();
+		for (int i = 0; i < adapter.getCount(); i++) {
+			if (adapter.getItem(i).equals(value)) {
+				index = i;
+				break; // terminate loop
+			}
+		}
+		spinner.setSelection(index);
 	}
 
 	public interface SettingDialogListener {

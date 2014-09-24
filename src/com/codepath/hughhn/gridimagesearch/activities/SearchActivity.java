@@ -7,8 +7,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -21,6 +24,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
+import android.widget.Toast;
 
 import com.codepath.hughhn.gridimagesearch.R;
 import com.codepath.hughhn.gridimagesearch.adapters.ImageResultsAdapter;
@@ -41,6 +45,13 @@ public class SearchActivity extends FragmentActivity implements
 	private SearchView searchView;
 	private String query;
 	private SettingsDialog settingsDialog;
+	
+	public Boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +74,11 @@ public class SearchActivity extends FragmentActivity implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
+				// Check Internet connection
+				if (!isNetworkAvailable()) {
+					Toast.makeText(getApplicationContext(), "network unavailable", Toast.LENGTH_SHORT).show();
+					return;
+				}
 				// Launch the image display activity
 				// Create an intent
 				Intent i = new Intent(SearchActivity.this,
@@ -83,8 +99,6 @@ public class SearchActivity extends FragmentActivity implements
 			@Override
 			public void onLoadMore(int page, int totalItemsCount) {
 				// Triggered only when new data needs to be appended to the list
-				// Add whatever code is needed to append new items to your
-				// AdapterView
 				customLoadMoreDataFromApi(SearchActivity.this.query, page);
 			}
 		});
@@ -146,6 +160,13 @@ public class SearchActivity extends FragmentActivity implements
 	}
 
 	public void customLoadMoreDataFromApi(String query, int page) {
+		// Check Internet connection
+		if (!isNetworkAvailable()) {
+			Toast.makeText(getApplicationContext(), "network unavailable", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		// Create HTTP request
 		AsyncHttpClient client = new AsyncHttpClient();
 
 		// https://ajax.googleapis.com/ajax/services/search/images
@@ -171,7 +192,7 @@ public class SearchActivity extends FragmentActivity implements
 			searchUrl.append("&as_sitesearch=" + cookieName);
 		}
 
-		Log.i("DEBUGG", "searchUrl = " + searchUrl.toString());
+		Log.i("DEBUG", "searchUrl = " + searchUrl.toString());
 		final int startPage = page;
 		client.get(searchUrl.toString(), new JsonHttpResponseHandler() {
 			@Override

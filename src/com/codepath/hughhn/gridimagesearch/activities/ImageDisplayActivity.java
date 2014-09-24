@@ -11,6 +11,7 @@ import android.provider.MediaStore.Images;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.codepath.hughhn.gridimagesearch.R;
 import com.codepath.hughhn.gridimagesearch.models.ImageResult;
@@ -32,6 +33,7 @@ public class ImageDisplayActivity extends Activity {
 		result = (ImageResult) getIntent().getSerializableExtra("result");
 		// Find the image view
 		ivImageResult = (ImageView) findViewById(R.id.ivImageResult);
+		
 		// Load the image url into imageview using Picasso
 		Picasso.with(this).load(result.fullUrl).fit().centerInside()
 				.into(ivImageResult);

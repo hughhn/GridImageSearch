@@ -2,6 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.codepath.hughhn.gridimagesearch.SearchActivity" >
 
+    <item android:id="@+id/action_search"
+          android:orderInCategory="5"
+          android:title="Search"
+          android:icon="@drawable/ic_action_search"
+          android:showAsAction="ifRoom|collapseActionView"
+          android:actionViewClass="android.widget.SearchView" />
+    
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

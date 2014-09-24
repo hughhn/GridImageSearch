@@ -1,8 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="${relativePackage}.${activityClass}" >
+    android:layout_height="match_parent" >
 
     <TextView
         android:id="@+id/tvSize"
@@ -52,8 +51,8 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/etType"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/tvColor"
         android:layout_alignRight="@+id/tvColor"
+        android:layout_below="@+id/tvColor"
         android:text="@string/setting_type_label" />
 
     <EditText
@@ -72,8 +71,8 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/etSite"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/tvType"
         android:layout_alignRight="@+id/tvColor"
+        android:layout_below="@+id/tvType"
         android:text="@string/setting_site_label" />
 
     <EditText
@@ -92,7 +91,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/etSite"
-        android:text="@string/settings_save_btn_label"
-        android:onClick="OnSaveClicked" />
+        android:text="@string/settings_save_btn_label" />
 
 </RelativeLayout>

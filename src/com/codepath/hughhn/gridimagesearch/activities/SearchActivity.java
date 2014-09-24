@@ -7,63 +7,58 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 
 import com.codepath.hughhn.gridimagesearch.R;
 import com.codepath.hughhn.gridimagesearch.adapters.ImageResultsAdapter;
+import com.codepath.hughhn.gridimagesearch.fragments.SettingsDialog;
+import com.codepath.hughhn.gridimagesearch.fragments.SettingsDialog.SettingDialogListener;
 import com.codepath.hughhn.gridimagesearch.listeners.EndlessScrollListener;
 import com.codepath.hughhn.gridimagesearch.models.ImageResult;
+import com.codepath.hughhn.gridimagesearch.models.SearchFilters;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-public class SearchActivity extends Activity {
-	private EditText etQuery;
+public class SearchActivity extends FragmentActivity implements
+		SettingDialogListener {
 	private GridView gvResults;
 	private ArrayList<ImageResult> imageResults;
 	private ImageResultsAdapter aImageResults;
 	SharedPreferences mSettings;
+	private SearchView searchView;
+	private String query;
+	private SettingsDialog settingsDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
 		setupViews();
-		imageResults = new ArrayList<ImageResult>();
-
-		// Attach data source to adapter
-		aImageResults = new ImageResultsAdapter(this, imageResults);
-
-		// Link adapter to gridView
-		gvResults.setAdapter(aImageResults);
-
-		// Attach endless scroll listener
-		gvResults.setOnScrollListener(new EndlessScrollListener() {
-			@Override
-			public void onLoadMore(int page, int totalItemsCount) {
-				// Triggered only when new data needs to be appended to the list
-				// Add whatever code is needed to append new items to your
-				// AdapterView
-				customLoadMoreDataFromApi(page);
-				// or customLoadMoreDataFromApi(totalItemsCount);
-			}
-		});
-
 	}
 
 	private void setupViews() {
-		etQuery = (EditText) findViewById(R.id.etQuery);
 		gvResults = (GridView) findViewById(R.id.gvResults);
+
+		// Initialize data source for gridView
+		imageResults = new ArrayList<ImageResult>();
+		// Attach data source to adapter
+		aImageResults = new ImageResultsAdapter(this, imageResults);
+		// Link adapter to gridView
+		gvResults.setAdapter(aImageResults);
+
 		gvResults.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -82,13 +77,42 @@ public class SearchActivity extends Activity {
 				startActivity(i);
 			}
 		});
+
+		// Attach endless scroll listener
+		gvResults.setOnScrollListener(new EndlessScrollListener() {
+			@Override
+			public void onLoadMore(int page, int totalItemsCount) {
+				// Triggered only when new data needs to be appended to the list
+				// Add whatever code is needed to append new items to your
+				// AdapterView
+				customLoadMoreDataFromApi(SearchActivity.this.query, page);
+			}
+		});
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.search, menu);
-		return true;
+		MenuItem searchItem = menu.findItem(R.id.action_search);
+		searchView = (SearchView) searchItem.getActionView();
+		searchView.setOnQueryTextListener(new OnQueryTextListener() {
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				// perform query here
+				SearchActivity.this.query = query;
+				aImageResults.clear();
+				customLoadMoreDataFromApi(SearchActivity.this.query, 0);
+
+				return true;
+			}
+
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				return false;
+			}
+		});
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
@@ -98,23 +122,30 @@ public class SearchActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			Intent i = new Intent(this, SettingsActivity.class);
-
-			// Execute my intent
-			startActivity(i);
+			showSettingsDiaglog();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	// Fire when button is pressed
-	public void onImageSearch(View v) {
-		aImageResults.clear();
-		customLoadMoreDataFromApi(0);
+	private void showSettingsDiaglog() {
+		FragmentManager fm = getSupportFragmentManager();
+		settingsDialog = SettingsDialog.newInstance();
+		settingsDialog.show(fm, "fragment_settings");
 	}
 
-	public void customLoadMoreDataFromApi(int page) {
-		String query = etQuery.getText().toString();
+	public void onFinishSettingsDialog(SearchFilters filters) {
+		SharedPreferences.Editor editor = mSettings.edit();
+		editor.clear();
+		editor.putString("imgsz", filters.imgSize);
+		editor.putString("imgcolor", filters.imgColor);
+		editor.putString("imgtype", filters.imgType);
+		editor.putString("as_sitesearch", filters.imgSite);
+		editor.commit();
+		settingsDialog.dismiss();
+	}
+
+	public void customLoadMoreDataFromApi(String query, int page) {
 		AsyncHttpClient client = new AsyncHttpClient();
 
 		// https://ajax.googleapis.com/ajax/services/search/images
@@ -146,7 +177,7 @@ public class SearchActivity extends Activity {
 			@Override
 			public void onSuccess(int statusCode, Header[] headers,
 					JSONObject response) {
-//				Log.d("DEBUG", response.toString());
+				Log.d("DEBUG", response.toString());
 
 				try {
 					JSONArray imageResultsJSON = response.getJSONObject(
@@ -162,6 +193,13 @@ public class SearchActivity extends Activity {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers,
+					String responseString, Throwable throwable) {
+				Log.d("DEBUG", responseString);
+				super.onFailure(statusCode, headers, responseString, throwable);
 			}
 		});
 	}

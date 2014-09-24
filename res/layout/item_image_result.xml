@@ -17,7 +17,8 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxLines="2"
+        android:maxWidth="75dp"
+        android:maxLines="3"
         android:ellipsize="end"
         android:text="@string/title_label" />
 
